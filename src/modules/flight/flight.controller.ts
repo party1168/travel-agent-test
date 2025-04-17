@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { FlightService } from './flight.service';
+import { IFlightResponse } from './flight.interface';
 
 @Controller('flight')
 export class FlightController {
@@ -7,8 +8,8 @@ export class FlightController {
   constructor(flightService: FlightService) {
     this.flightService = flightService;
   }
-  @Get()
-  getFlight(): string {
-    return this.flightService.getFlight();
+  @Get(':origin')
+  async getFlight(@Param('origin') origin: string): Promise<IFlightResponse> {
+    return await this.flightService.getFlight(origin);
   }
 }
