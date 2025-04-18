@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { FlightService } from './flight.service';
-import { IFlightResponse } from './flight.interface';
+import { FlightResponseDTO } from './flight.dto';
 
 @Controller('flight')
 export class FlightController {
@@ -9,7 +9,7 @@ export class FlightController {
     this.flightService = flightService;
   }
   @Get(':origin')
-  async getFlight(@Param('origin') origin: string): Promise<IFlightResponse> {
+  async getFlight(@Param('origin') origin: string): Promise<FlightResponseDTO> {
     return await this.flightService.getFlight(origin);
   }
 }

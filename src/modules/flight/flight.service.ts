@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IAuthToken, IFlightResponse } from './flight.interface';
+import { AuthTokenDTO, FlightResponseDTO } from './flight.dto';
 import axios from 'axios';
 
 @Injectable()
@@ -25,9 +25,9 @@ export class FlightService {
     nonStop: boolean = false,
     maxPrice?: number,
     viewBy: string = 'COUNTRY',
-  ): Promise<IFlightResponse> {
+  ): Promise<FlightResponseDTO> {
     const token = await this.getAccessToken();
-    const res = await axios.get<IFlightResponse>(
+    const res = await axios.get<FlightResponseDTO>(
       `https://${this.baseUrl}/shopping/flight-destinations`,
       {
         headers: { Authorization: token },
@@ -49,7 +49,7 @@ export class FlightService {
   }
 
   private async getAccessToken(): Promise<string> {
-    const token = await axios.post<IAuthToken>(
+    const token = await axios.post<AuthTokenDTO>(
       this.authUrl,
       {
         grant_type: 'client_credentials',
