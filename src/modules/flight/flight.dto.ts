@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, IsNumber, IsObject } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsBoolean,
+  IsEnum,
+} from 'class-validator';
 
 export class AuthTokenDTO {
   @IsNotEmpty()
@@ -107,4 +115,33 @@ export class LocationDetailsDTO {
   @IsNotEmpty()
   @IsString()
   detailedName: string; // Full name of the airport, e.g., "ADOLFO SUAREZ BARAJAS"
+}
+
+export class GetFlightDTO {
+  @IsString()
+  origin: string;
+
+  @IsOptional()
+  @IsString()
+  departureDate?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  oneWay?: boolean;
+
+  @IsOptional()
+  @IsString()
+  duration?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  nonStop?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  maxPrice?: number;
+
+  @IsOptional()
+  @IsEnum(['COUNTRY', 'CITY', 'AIRPORT'])
+  viewBy?: string = 'COUNTRY';
 }

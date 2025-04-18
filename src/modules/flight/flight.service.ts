@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AuthTokenDTO, FlightResponseDTO } from './flight.dto';
+import { AxiosError } from 'axios';
+import { AuthTokenDTO, FlightResponseDTO, GetFlightDTO } from './flight.dto';
 import axios from 'axios';
 
 @Injectable()
@@ -17,35 +18,38 @@ export class FlightService {
       'AMADEUS_CLIENT_SECRET',
     ) as string;
   }
-  async getFlight(
-    origin: string,
-    departureDate?: string,
-    oneWay: boolean = false,
-    duration?: string,
-    nonStop: boolean = false,
-    maxPrice?: number,
-    viewBy: string = 'COUNTRY',
-  ): Promise<FlightResponseDTO> {
+  async getFlight(getFlightDto: GetFlightDTO): Promise<FlightResponseDTO> {
     const token = await this.getAccessToken();
-    const res = await axios.get<FlightResponseDTO>(
-      `https://${this.baseUrl}/shopping/flight-destinations`,
-      {
-        headers: { Authorization: token },
-        params: {
-          origin,
-          oneWay,
-          nonStop,
-          viewBy,
-          departureDate,
-          duration,
-          maxPrice,
-        },
-      },
-    );
-    if (!res.data) {
-      throw new Error('Failed to get flight data');
+    try {
+      const res = await axios
+        .get<FlightResponseDTO>(
+          `https://${this.baseUrl}/shopping/flight-destinations`,
+          {
+            headers: { Authorization: token },
+            params: {
+              ...getFlightDto,
+            },
+          },
+        )
+        .catch((err) => {
+          if (axios.isAxiosError(err)) {
+            const error = err as AxiosError;
+            const statusCode = error.response?.status;
+            const errorMessage = error.response?.data;
+
+            throw new Error(`Error ${statusCode}: ${String(errorMessage)}`);
+          } else {
+            throw new Error('An unexpected error occurred');
+          }
+        });
+      if (!res.data) {
+        throw new Error('Failed to get flight data');
+      }
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
-    return res.data;
   }
 
   private async getAccessToken(): Promise<string> {
